@@ -2,7 +2,6 @@ name: BUILD WAVEVXY GHOUL EDITION
 
 on:
   workflow_dispatch:
-  workflow_dispatch:
   push:
     branches: [ "main" ]
 
@@ -14,7 +13,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
   workflow_dispatch:
-  workflow_dispatch:
     steps:
       - name: 🧛‍♂️ Clone Markas
         uses: actions/checkout@v4
@@ -24,9 +22,7 @@ jobs:
         with:
           distribution: 'temurin'
   workflow_dispatch:
-  workflow_dispatch:
           java-version: '17'
-  workflow_dispatch:
   workflow_dispatch:
       - uses: subosito/flutter-action@v2
         with:
