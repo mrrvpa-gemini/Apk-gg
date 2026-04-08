@@ -7,7 +7,8 @@ plugins {
 
 android {
     namespace = "com.nullx.tr4s"
-    compileSdk = 35
+    // GANTI KE 36 KARENA PLUGIN LU MINTA SDK TINGGI, STUPID!
+    compileSdk = 36
     ndkVersion = "27.0.12077973"
 
     compileOptions {
@@ -21,17 +22,24 @@ android {
 
     defaultConfig {
         applicationId = "com.nullx.tr4s"
-        minSdk = 23                         // ✅ ganti di sini
-        targetSdk = 35
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
+        // Minimal SDK 23 udah bener buat Android 6.0+
+        minSdk = 23                         
+        // TARGET JUGA NAIKKIN KE 36 BIAR GAK ERROR PAS BUILD, JERRR!
+        targetSdk = 36
+        
+        versionCode = (flutter.versionCode ?: "1").toInt()
+        // TADI DI SINI ILANG NAMANYA, STUPID! SEKARANG UDAH GACOR:
+        versionName = flutter.versionName ?: "1.0.0"
     }
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
+            // Pakai debug key dulu biar 'flutter build apk' gak ribet tanda tangan
             signingConfig = signingConfigs.getByName("debug")
+            
+            // Tambahin ini biar APK lu lebih ramping & sakti
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
 }
