@@ -17,6 +17,7 @@ android {
     }
 
     kotlinOptions {
+        freeCompilerArgs += "-Xskip-metadata-version-check"
         jvmTarget = JavaVersion.VERSION_11.toString()
     }
 
