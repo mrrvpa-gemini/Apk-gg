@@ -1,57 +1,37 @@
-name: BUILD WAVEVXY GHOUL EDITION
+name: BUILD WAVEVXY
 
 on:
-  workflow_dispatch:
   push:
-    branches: [ "main" ]
-
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-  ICON_URL: "https://i.pinimg.com/736x/9d/2d/f3/9d2df34e61fc56a8ed86451c849577ba.jpg"
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-  workflow_dispatch:
     steps:
-      - name: 🧛‍♂️ Clone Markas
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: 🧛‍♂️ Ritual Java & Flutter
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-  workflow_dispatch:
+          distribution: 'zulu'
           java-version: '17'
-  workflow_dispatch:
-      - uses: subosito/flutter-action@v2
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
         with:
+          flutter-version: '3.22.2'
           channel: 'stable'
-          cache: true
 
-      - name: 🧛‍♂️ Ritual Pasang Icon Ghoul
-        run: |
-          # Download gambar Ghoul kasta Maestro
-          curl -L -o ghoul_icon.jpg ${{ env.ICON_URL }}
-          
-          # Timpa semua icon launcher default (mipmap)
-          # Kita cari semua folder mipmap dan ganti ic_launcher.png pake Ghoul ini
-          find android/app/src/main/res -name "ic_launcher.png" -exec cp ghoul_icon.jpg {} \;
-          echo "Icon Ghoul Berhasil Dipasang, JERRR! 🧛‍♂️🩸"
+      - name: Install Dependencies
+        run: flutter pub get
 
-      - name: 🧛‍♂️ Konfigurasi WaveVXY & Bypass
-        run: |
-          find . -name "AndroidManifest.xml" -exec sed -i 's/android:label="[^"]*"/android:label="WaveVXY"/g' {} +
-          find . -name "gradle.properties" -exec sh -c 'echo "android.experimental.checkDependenciesMetadata=false" >> {}' \;
-          find . -name "build.gradle*" -exec sed -i 's/compileSdk = [0-9]*/compileSdk = 35/g' {} +
+      - name: Build APK
+        run: flutter build apk --release
 
-      - name: 🧛‍♂️ Rakit WaveVXY
-        run: |
-          flutter pub get
-          flutter build apk --debug --target-platform android-arm64 --no-tree-shake-icons --android-skip-build-dependency-validation
-
-      - name: 🧛‍♂️ Kirim ke Tahta
+      - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: WaveVXY-Ghoul-Version
-          path: "**/*.apk"
+          name: release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
