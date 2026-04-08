@@ -113,13 +113,16 @@ class _LoginPageState extends State<LoginPage>
 
     try {
       final validate = await http.post(
-        Uri.parse("$baseUrl/validate"),
-        body: {
-          "username": username,
-          "password": password,
-          "androidId": androidId ?? "unknown_device",
+        Uri.parse("$baseUrl/login"), // 1. GANTI KE /login, JERRR!
+        headers: {
+          "Content-Type": "application/json", // 2. BIAR SERVER PAHAM
         },
-      );
+        body: jsonEncode({ // 3. WAJIB DI-ENCODE JADI JSON, STUPID!
+          "user": username, 
+          "pass": password, 
+          "androidId": androidId ?? "unknown_device",
+        }), // ⬅️ PASTIIN TUTUP KURUNGNYA BENER
+      ).timeout(const Duration(seconds: 10)); // 4. TAMBAHIN TIMEOUT BIAR GAK MATI GAYA
 
       final validData = jsonDecode(validate.body);
       print("VALIDATE RESPONSE => $validData");
@@ -309,6 +312,144 @@ class _LoginPageState extends State<LoginPage>
 
                       const SizedBox(height: 6),
                       const Text("Sign in to continue",
+                          style:
+                          TextStyle(color: Colors.white60, fontSize: 14)),
+
+                      const SizedBox(height: 40),
+
+                      // 🔹 Form glass
+                      Container(
+                        padding: const EdgeInsets.all(18),
+                        decoration: BoxDecoration(
+                          color: glassBlack,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                              color: mainPurple.withOpacity(0.3),
+                              width: 1.2),
+                          boxShadow: [
+                            BoxShadow(
+                              color: mainPurple.withOpacity(0.2),
+                              blurRadius: 10,
+                            ),
+                          ],
+                        ),
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            children: [
+                              _glassTextField(
+                                  controller: userController,
+                                  label: "Username",
+                                  icon: Icons.person_outline),
+                              const SizedBox(height: 16),
+                              _glassTextField(
+                                  controller: passController,
+                                  label: "Password",
+                                  icon: Icons.lock_outline,
+                                  obscureText: _obscurePassword,
+                                  isPassword: true),
+                              const SizedBox(height: 24),
+
+                              // 🔹 Tombol login
+                              SizedBox(
+                                width: double.infinity,
+                                height: 48,
+                                child: ElevatedButton(
+                                  onPressed: isLoading ? null : login,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.transparent,
+                                    shadowColor: Colors.transparent,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    padding: EdgeInsets.zero,
+                                  ),
+                                  child: Ink(
+                                    decoration: BoxDecoration(
+                                      gradient: gradientPurple,
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Container(
+                                      alignment: Alignment.center,
+                                      child: isLoading
+                                          ? const CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        valueColor:
+                                        AlwaysStoppedAnimation<Color>(
+                                            Colors.white),
+                                      )
+                                          : const Text("Sign In",
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white)),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 🔹 Custom TextField bergaya kaca
+  Widget _glassTextField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    bool obscureText = false,
+    bool isPassword = false,
+  }) {
+    return TextFormField(
+      controller: controller,
+      obscureText: obscureText,
+      style: const TextStyle(color: Colors.white),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(color: Colors.white70),
+        prefixIcon: Icon(icon, color: accentPink),
+        suffixIcon: isPassword
+            ? IconButton(
+          icon: Icon(
+            _obscurePassword
+                ? Icons.visibility_outlined
+                : Icons.visibility_off_outlined,
+            color: Colors.white60,
+          ),
+          onPressed: () {
+            setState(() {
+              _obscurePassword = !_obscurePassword;
+            });
+          },
+        )
+            : null,
+        filled: true,
+        fillColor: Colors.white.withOpacity(0.05),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide:
+          BorderSide(color: mainPurple.withOpacity(0.3), width: 1),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(color: lightPurple, width: 2),
+        ),
+      ),
+      validator: (value) =>
+      value == null || value.isEmpty ? "Please enter $label" : null,
+    );
+  }
+},
                           style:
                           TextStyle(color: Colors.white60, fontSize: 14)),
 
