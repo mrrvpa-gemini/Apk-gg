@@ -27,9 +27,9 @@ android {
         // TARGET JUGA NAIKKIN KE 36 BIAR GAK ERROR PAS BUILD, JERRR!
         targetSdk = 36
         
-        versionCode = (flutter.versionCode ?: "1").toInt()
+        versionCode = flutter.versionCode ?: 1
         // TADI DI SINI ILANG NAMANYA, STUPID! SEKARANG UDAH GACOR:
-        versionName = flutter.versionName ?: "1.0.0"
+        versionName = flutter.versionName ?: "1.0" ?: "1.0.0"
     }
 
     buildTypes {
