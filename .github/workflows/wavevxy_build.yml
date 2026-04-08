@@ -1,38 +1,53 @@
-name: BUILD WAVEVXY MAESTRO
+name: BUILD WAVEVXY GHOUL EDITION
 
 on:
   push:
     branches: [ "main" ]
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  ICON_URL: "https://i.pinimg.com/736x/9d/2d/f3/9d2df34e61fc56a8ed86451c849577ba.jpg"
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - name: 🧛‍♂️ Clone Markas
+        uses: actions/checkout@v4
+
+      - name: 🧛‍♂️ Ritual Java & Flutter
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.0'
+          channel: 'stable'
+          cache: true
 
-      - name: 🧛‍♂️ Konfigurasi Kasta Maestro
+      - name: 🧛‍♂️ Ritual Pasang Icon Ghoul
         run: |
-          # Ganti Nama APK
-          sed -i 's/android:label="[^"]*"/android:label="WaveVXY"/g' android/app/src/main/AndroidManifest.xml
-          # Bypass SDK & AAPT2
-          echo "android.experimental.checkDependenciesMetadata=false" >> android/gradle.properties
-          sed -i 's/compileSdk = [0-9]*/compileSdk = 35/g' android/app/build.gradle.kts || sed -i 's/compileSdk [0-9]*/compileSdk 35/g' android/app/build.gradle
+          # Download gambar Ghoul kasta Maestro
+          curl -L -o ghoul_icon.jpg ${{ env.ICON_URL }}
+          
+          # Timpa semua icon launcher default (mipmap)
+          # Kita cari semua folder mipmap dan ganti ic_launcher.png pake Ghoul ini
+          find android/app/src/main/res -name "ic_launcher.png" -exec cp ghoul_icon.jpg {} \;
+          echo "Icon Ghoul Berhasil Dipasang, JERRR! 🧛‍♂️🩸"
 
-      - name: 🧛‍♂️ Rakit APK
+      - name: 🧛‍♂️ Konfigurasi WaveVXY & Bypass
+        run: |
+          find . -name "AndroidManifest.xml" -exec sed -i 's/android:label="[^"]*"/android:label="WaveVXY"/g' {} +
+          find . -name "gradle.properties" -exec sh -c 'echo "android.experimental.checkDependenciesMetadata=false" >> {}' \;
+          find . -name "build.gradle*" -exec sed -i 's/compileSdk = [0-9]*/compileSdk = 35/g' {} +
+
+      - name: 🧛‍♂️ Rakit WaveVXY
         run: |
           flutter pub get
           flutter build apk --debug --target-platform android-arm64 --no-tree-shake-icons --android-skip-build-dependency-validation
 
-      - name: 🧛‍♂️ Simpan WaveVXY
+      - name: 🧛‍♂️ Kirim ke Tahta
         uses: actions/upload-artifact@v4
         with:
-          name: WaveVXY-Final
-          path: build/app/outputs/flutter-apk/app-debug.apk
-          
+          name: WaveVXY-Ghoul-Version
+          path: "**/*.apk"
