@@ -6,7 +6,7 @@
     <application
         android:label="HoxtenCloud"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/launcher_icon"
         android:usesCleartextTraffic="true"> <!-- ⬅️ WAJIB UNTUK HTTP -->
         <activity
             android:name=".MainActivity"
